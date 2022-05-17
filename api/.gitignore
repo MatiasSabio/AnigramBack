@@ -1,0 +1,5 @@
+.env
+node_modeles
+.prettierrc.json
+.eslintrc.json
+.vercel

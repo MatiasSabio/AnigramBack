@@ -34,15 +34,23 @@ const createUser = async (_, { user }) => {
 // };
 const addOrDeleteFav = async (_, { photoID }, { user }) => {
   const { _id } = await user;
-  const actualUser = await User.findById({ _id });
+  let { likes } = await Photo.findById({ _id });
+  const actualUser = await User.findById({ id: photoID });
   const userFavsWithoutPhoto = actualUser.favs.filter((id) => id !== photoID);
   if (actualUser.favs.length === userFavsWithoutPhoto.length) {
     userFavsWithoutPhoto.push(photoID);
+    likes += 1;
   }
+  likes -= 1;
+  const photo = await Photo.findByIdAndUpdate(
+    { _id: photoID },
+    { $set: { likes } },
+  );
   const userFavs = await User.findByIdAndUpdate(
     { _id },
     { $set: { favs: userFavsWithoutPhoto } },
   );
+  photo.save();
   userFavs.save();
   return {
     name: actualUser.name,
@@ -56,8 +64,6 @@ const login = async (_, { input }) => {
   const user = await User.findOne({ email }).select('+password');
   if (!user) throw new Error('User Not Found');
   if (password !== user.password) throw new Error('Invalid Password');
-  // eslint-disable-next-line no-underscore-dangle
-
   const token = createJWToken(user);
   return token;
 };

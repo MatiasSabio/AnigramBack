@@ -29,7 +29,6 @@ const getAllFavs = async () => {
 const getOneFavs = async (_, args, { user }) => {
   const { _id } = await user;
   const favs = await Favs.findOne({ userID: _id });
-  console.log(_id);
   return favs;
 };
 
